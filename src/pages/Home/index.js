@@ -8,8 +8,12 @@ import firebase from '../../services/firebase';
 import Header from '../../components/Header';
 import HistoricoList from '../../components/historicoList';
 
-import { Container, Background, Nome, Saldo, Title, List } from './styles.js';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
+import { Container, Background, Nome, Saldo, Title, List, Area } from './styles.js';
 import { format, isBefore } from 'date-fns';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import DatePicker from '../../components/DatePicker';
 
 export default function Home() {
   const [saldo, setSaldo] = useState(0);
@@ -18,13 +22,17 @@ export default function Home() {
   const { user } = useContext(AuthContext);
   const uid = user && user.uid
 
+  const newDate = new Date()
+  const [show, setShow] = useState(false);
+
+
   useEffect(() => {
     async function loadList() {
       await firebase.database().ref('users').child(uid).on('value', (snapshot) => {
         setSaldo(snapshot.val().saldo);
       })
 
-      await firebase.database().ref('historico').child(uid).orderByChild('date').equalTo(format(new Date, 'dd/MM/yyyy')).limitToLast(10).on('value', (snapshot) => {
+      await firebase.database().ref('historico').child(uid).orderByChild('date').equalTo(format(newDate, 'dd/MM/yyyy')).limitToLast(10).on('value', (snapshot) => {
         setHistorico([]);
         snapshot.forEach((childItem) => {
           let list = {
@@ -39,7 +47,7 @@ export default function Home() {
     }
 
     loadList();
-  }, [])
+  }, [newDate])
 
   function handleDelete(data) {
 
@@ -83,6 +91,21 @@ export default function Home() {
         console.log(error);
       })
   }
+
+
+  function handleShowPicker() {
+    alert('Clicou');
+  }
+
+  function handleClose() {
+    setShow(false);
+  }
+
+  function onChange(date) {
+    setShow(Platform.OS === 'ios');
+    setShow(false);
+  }
+
    
   
  return (
@@ -95,12 +118,24 @@ export default function Home() {
 
       <Title>Ultimas movimentaçoes</Title>
 
+      <Area>
+      <TouchableOpacity onPress={() => handleShowPicker()}>
+        <Icon onPress={() => setShow(true)} name='event' color={"#fff"} size={30} />
+      </TouchableOpacity>
+      </Area>
+
       <List
         showsVerticalScrollIndicator={false}
         data={historico}
         keyExtractor={item => item.key}
         renderItem={({ item }) => (<HistoricoList data={item} deleteItem={handleDelete}/>)}
       />
+
+      {
+        show && (
+          <DatePicker onClose={handleClose} date={newDate} onChange={onChange} />
+        )
+      }
 
    </Background>
   );
