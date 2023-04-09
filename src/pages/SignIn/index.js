@@ -17,7 +17,13 @@ import {
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { signIn } = useContext(AuthContext);
   const navigation = useNavigation()
+
+
+  function handleLogin(){
+    signIn(email, password);
+  }
 
   return (
     <Background>
@@ -44,7 +50,7 @@ export default function SignIn() {
             onChangeText={(text) => setPassword(text)}
           />
         </AreaInput>
-        <SubmitButton>
+        <SubmitButton onPress={handleLogin}>
           <SubmitText>Acessar</SubmitText>
         </SubmitButton>
         <Link onPress={() => navigation.navigate("SignUp")}>
