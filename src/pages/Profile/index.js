@@ -1,6 +1,8 @@
 import React, {useContext} from 'react';
 import {useNavigation} from '@react-navigation/native';
 
+import Header from '../../components/Header';
+
 import {AuthContext} from '../../contexts/auth';
 
 
@@ -11,6 +13,7 @@ export default function Profile() {
   const navigation = useNavigation();
   return (
    <Container>
+      <Header />
       <Nome>
         {user && user.nome}q
       </Nome>
